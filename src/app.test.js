@@ -58,7 +58,38 @@ describe('App', () => {
         })
     })
 
-    test.only('Combined render and update with async ComponentDidUpdate', (done) => {
+    // This test should really be split up, but the primary purpose is to show how to use
+    // the state emitter
+    test.only('Combined render and update with async - new', (done) => {
+        expect.assertions(3)
+
+        const EnzymeStateChangeEmitter = require('./EnzymeStateChangeEmitter')
+        const app = new EnzymeStateChangeEmitter(<App />)
+
+        // The first state change is from the mock response
+        // The current state of the component should be the default, 0
+        app.on('setState:begin:1', (context) => {
+            expect(app.wrapper.state('price')).toBe(0)
+        })
+
+        // The first completed state change should be the price from the mock response, 50
+        // We then trigger a button click
+        app.on('setState:complete:1', (context) => {
+            expect(app.wrapper.state('price')).toBe(50)
+            app.wrapper.find('button').simulate('click')
+        })
+
+        // The 2nd completed state change should be from the result of the button click, 50 + 10
+        app.on('setState:complete:2', (context) => {
+            expect(app.wrapper.state('price')).toBe(60)
+            done()
+        })
+
+        app.mount()
+
+    })
+
+    test('Combined render and update with async ComponentDidUpdate', (done) => {
         expect.assertions(1)
         let app, originalCallback
 
