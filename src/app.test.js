@@ -1,6 +1,9 @@
 import React from 'react'
 import App from './app'
 import { setImmediate } from 'timers'
+import { EventEmitter } from 'events';
+const util = require('util');
+const log = util.debuglog('jest');
 
 describe('App', () => {
     const originals = {}
@@ -9,7 +12,7 @@ describe('App', () => {
     beforeAll(() => {
         originals.setState = App.prototype.setState
 
-        mock = new mocker(axios)
+        mock = new mocker(axios, { delayResponse: 1000 })
         
         const data = { bpi: { "USD": { rate: 50}}}
         mock.onGet('https://api.coindesk.com/v1/bpi/currentprice/USD.json').reply(200, data)
@@ -53,5 +56,31 @@ describe('App', () => {
             expect(el.props.children[1]).toBe(50)
             done()
         })
+    })
+
+    test.only('Combined render and update with async ComponentDidUpdate', (done) => {
+        expect.assertions(1)
+        let app, originalCallback
+
+        const assert = () => {
+            expect(app.state('price')).toBe(50)
+            
+            // If the component had a real callback, we need to make sure that runs
+            if (typeof originalCallback === 'function'){
+                originalCallback()
+            }
+
+            done()
+        }
+        
+        const setState = React.Component.prototype.setState
+        // Intercept the component setState method so we can inject our assertions
+        React.Component.prototype.setState = function(){
+            originalCallback = arguments[1]
+            // Invoke the original setState with the proper context, state argument, but with our assertion callback
+            setState.apply(this, [arguments[0], assert])
+        }
+        
+        app = mount(<App />)
     })
 })

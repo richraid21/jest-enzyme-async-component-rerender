@@ -10,7 +10,9 @@ export default class App extends React.Component {
     componentDidMount(){
         axios.get('https://api.coindesk.com/v1/bpi/currentprice/USD.json')
             .then((res) => {
-                this.setState({price: res.data['bpi']['USD'].rate})
+                this.setState({price: res.data['bpi']['USD'].rate}, () => {
+                    console.log('SetState Default Callback')
+                })
             })
     }
     

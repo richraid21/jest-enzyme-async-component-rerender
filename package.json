@@ -8,7 +8,8 @@
   "dependencies": {
     "axios": "^0.17.1",
     "react": "^16.2.0",
-    "react-dom": "^16.2.0"
+    "react-dom": "^16.2.0",
+    "winston": "^2.4.0"
   },
   "devDependencies": {
     "axios-mock-adapter": "^1.10.0",
@@ -25,7 +26,9 @@
   "jest": {
     "setupFiles": [
       "./jest.js"
-    ]
+    ],
+    "verbose": true,
+    "bail": false
   },
   "scripts": {
     "build": "webpack",
