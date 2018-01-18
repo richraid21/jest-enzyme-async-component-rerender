@@ -68,6 +68,7 @@ describe('App', () => {
 
         // The first state change is from the mock response
         // The current state of the component should be the default, 0
+        // <method>:<lifecycleStage>:<invocationCount>
         app.on('setState:begin:1', (context) => {
             expect(app.wrapper.state('price')).toBe(0)
         })
